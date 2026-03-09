@@ -19,7 +19,7 @@ class Player(db.Model):
     crystal_fragments = db.Column(db.Integer, default=0)
     # JSON-encoded lists
     unlocked_characters = db.Column(db.Text, default='["explorer"]')
-    worlds_unlocked = db.Column(db.Text, default='[1]')
+    worlds_unlocked = db.Column(db.Text, default='[1, 2, 3, 4, 5, 6, 7, 8, 9]')
     bosses_defeated = db.Column(db.Text, default='[]')
     # Stats
     total_questions_answered = db.Column(db.Integer, default=0)
@@ -39,7 +39,7 @@ class Player(db.Model):
         self.unlocked_characters = json.dumps(chars)
 
     def get_worlds_unlocked(self):
-        return json.loads(self.worlds_unlocked or '[1]')
+        return json.loads(self.worlds_unlocked or '[1, 2, 3, 4, 5, 6, 7, 8, 9]')
 
     def set_worlds_unlocked(self, worlds):
         self.worlds_unlocked = json.dumps(worlds)

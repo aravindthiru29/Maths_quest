@@ -154,6 +154,13 @@ const GameEngine = {
 
     isLevelUnlocked(levelNum) {
         if (levelNum === 1) return true;
+        
+        // Also unlock if it's the first level of its world and the world is unlocked
+        const world = GameData.getWorld(levelNum);
+        if (world && world.levelStart === levelNum && this.state.worldsUnlocked.includes(world.id)) {
+            return true;
+        }
+
         return !!this.state.levelsCompleted[levelNum - 1];
     },
 

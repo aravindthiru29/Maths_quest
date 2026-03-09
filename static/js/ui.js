@@ -154,7 +154,6 @@ const UI = {
             return `
             <button class="world-card glass-card ${unlocked ? '' : 'locked'} ${defeated ? 'completed' : ''}"
                     data-world="${w.id}" style="--world-color: ${w.color}; --world-gradient: ${w.gradient}">
-                <div class="world-icon">${w.icon}</div>
                 <h3>${w.name}</h3>
                 <p>${unlocked ? w.description : '🔒 Complete previous world'}</p>
                 ${unlocked ? `<div class="progress-bar"><div class="progress-fill" style="width:${progress.percentage}%"></div></div>
@@ -202,7 +201,7 @@ const UI = {
         <div class="screen levels-screen" style="--world-gradient: ${world.gradient}">
             <div class="screen-header">
                 <button class="btn btn-icon" id="btn-back-worlds">← Back</button>
-                <h2>${world.icon} ${world.name}</h2>
+                <h2>${world.name}</h2>
                 <div></div>
             </div>
             <p class="world-story">${world.story}</p>
@@ -214,7 +213,7 @@ const UI = {
         });
     },
 
-    // ===== STORY INTRO =====
+    // STORY INTRO 
     async _renderStory(data) {
         const world = GameData.getWorld(data.levelNum);
         const isBoss = data.levelNum === world.bossLevel;
@@ -250,7 +249,7 @@ const UI = {
         });
     },
 
-    // ===== GAMEPLAY =====
+    // GAMEPLAY 
     _renderGameplay(data) {
         const level = GameEngine.currentLevel;
         const world = GameData.getWorld(data.levelNum);
@@ -397,7 +396,7 @@ const UI = {
         }
     },
 
-    // ===== RESULTS =====
+    // RESULTS 
     _renderResults(data) {
         const starsHTML = '⭐'.repeat(data.stars) + '☆'.repeat(3 - data.stars);
         const percentage = Math.round(data.accuracy * 100);
@@ -441,7 +440,7 @@ const UI = {
         document.getElementById('btn-to-menu').addEventListener('click', () => this.showScreen('menu'));
     },
 
-    // ===== SHOP =====
+    // SHOP 
     _renderShop() {
         const s = GameEngine.state;
         const chars = GameData.characters.map(c => {
@@ -483,7 +482,7 @@ const UI = {
         });
     },
 
-    // ===== STATS =====
+    // STATS 
     _renderStats() {
         const s = GameEngine.state;
         const acc = s.stats.totalQuestionsAnswered > 0 ? Math.round((s.stats.correctAnswers / s.stats.totalQuestionsAnswered) * 100) : 0;
@@ -508,7 +507,7 @@ const UI = {
                 ${GameData.worlds.map(w => {
                     const p = StorageManager.getWorldProgress(s, w.id);
                     return `<div class="world-progress-item glass-card">
-                        <span>${w.icon} ${w.name}</span>
+                        <span>${w.name}</span>
                         <div class="progress-bar"><div class="progress-fill" style="width:${p.percentage}%;background:${w.gradient}"></div></div>
                         <span>${p.percentage}%</span>
                     </div>`;
@@ -518,7 +517,7 @@ const UI = {
         document.getElementById('btn-back-stats').addEventListener('click', () => this.showScreen('menu'));
     },
 
-    // ===== HELPERS =====
+    // HELPERS 
     _mathSymbols() {
         const syms = ['+', '−', '×', '÷', '=', 'π', '√', 'Σ', '∞', 'θ', 'Δ', '%', '∫', '≈'];
         return Array.from({ length: 30 }, () => {

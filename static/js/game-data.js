@@ -3,63 +3,63 @@
 const GameData = {
     worlds: [
         {
-            id: 1, name: 'Arithmetic Village', icon: '🏘️', levelStart: 1, levelEnd: 5,
+            id: 1, name: 'Arithmetic Village', levelStart: 1, levelEnd: 5,
             color: '#2ecc71', gradient: 'linear-gradient(135deg, #2ecc71, #f1c40f)',
             description: 'Master addition and subtraction to rebuild the village!',
             story: 'The villagers have lost count of everything! Help them restore order with your arithmetic skills.',
             bossName: 'The Number Goblin', bossLevel: 5
         },
         {
-            id: 2, name: 'Multiplication Valley', icon: '⛰️', levelStart: 6, levelEnd: 10,
+            id: 2, name: 'Multiplication Valley', levelStart: 6, levelEnd: 10,
             color: '#3498db', gradient: 'linear-gradient(135deg, #3498db, #8e44ad)',
             description: 'Conquer the valley with multiplication and division!',
             story: 'The valley bridges are broken. Only multiplication can rebuild them!',
             bossName: 'The Factor Beast', bossLevel: 10
         },
         {
-            id: 3, name: 'Fraction Kingdom', icon: '👑', levelStart: 11, levelEnd: 15,
+            id: 3, name: 'Fraction Kingdom', levelStart: 11, levelEnd: 15,
             color: '#9b59b6', gradient: 'linear-gradient(135deg, #9b59b6, #e91e63)',
             description: 'Unite the Fraction Kingdom with equal parts!',
             story: 'The kingdom is divided! Use fractions to bring the pieces together.',
             bossName: 'The Slice Sorcerer', bossLevel: 15
         },
         {
-            id: 4, name: 'Algebra City', icon: '🏙️', levelStart: 16, levelEnd: 20,
+            id: 4, name: 'Algebra City', levelStart: 16, levelEnd: 20,
             color: '#e67e22', gradient: 'linear-gradient(135deg, #e67e22, #e74c3c)',
             description: 'Decode the mysteries of variables and equations!',
             story: 'The city runs on equations, but the variables have gone missing!',
             bossName: 'The Unknown X', bossLevel: 20
         },
         {
-            id: 5, name: 'Geometry Jungle', icon: '🌿', levelStart: 21, levelEnd: 25,
+            id: 5, name: 'Geometry Jungle', levelStart: 21, levelEnd: 25,
             color: '#1abc9c', gradient: 'linear-gradient(135deg, #1abc9c, #2ecc71)',
             description: 'Navigate shapes and angles in the wild jungle!',
             story: 'The jungle paths form mysterious shapes. Decode them to find your way!',
             bossName: 'The Shape Shifter', bossLevel: 25
         },
         {
-            id: 6, name: 'Coordinate Galaxy', icon: '🌌', levelStart: 26, levelEnd: 30,
+            id: 6, name: 'Coordinate Galaxy', levelStart: 26, levelEnd: 30,
             color: '#2c3e50', gradient: 'linear-gradient(135deg, #2c3e50, #3498db)',
             description: 'Plot your course through the stars!',
             story: 'The star maps are scrambled! Use coordinates to navigate the galaxy.',
             bossName: 'The Void Navigator', bossLevel: 30
         },
         {
-            id: 7, name: 'Trigonometry Tower', icon: '🗼', levelStart: 31, levelEnd: 35,
+            id: 7, name: 'Trigonometry Tower', levelStart: 31, levelEnd: 35,
             color: '#c0392b', gradient: 'linear-gradient(135deg, #c0392b, #f39c12)',
             description: 'Climb the tower using angles and ratios!',
             story: 'Each floor of the tower is locked with trigonometric puzzles!',
             bossName: 'The Angle Demon', bossLevel: 35
         },
         {
-            id: 8, name: 'Probability Lab', icon: '🔬', levelStart: 36, levelEnd: 40,
+            id: 8, name: 'Probability Lab', levelStart: 36, levelEnd: 40,
             color: '#00bcd4', gradient: 'linear-gradient(135deg, #00bcd4, #7c4dff)',
             description: 'Predict the unpredictable in the lab!',
             story: 'The lab experiments are out of control! Use probability to restore order.',
             bossName: 'Dr. Random', bossLevel: 40
         },
         {
-            id: 9, name: 'Chaos Castle', icon: '🏰', levelStart: 41, levelEnd: 45,
+            id: 9, name: 'Chaos Castle', levelStart: 41, levelEnd: 45,
             color: '#4a0e4e', gradient: 'linear-gradient(135deg, #4a0e4e, #c0392b)',
             description: 'Face Lord Chaos and restore the Crystal of Knowledge!',
             story: 'The final battle awaits. All your math skills will be tested!',

@@ -5,7 +5,7 @@ const StorageManager = {
     CACHE_KEY: 'mathquest_cache',
     API_BASE: '/api',
 
-    // ── API helpers ──
+    // API helpers 
     async _fetch(url, options = {}) {
         try {
             const res = await fetch(this.API_BASE + url, {
@@ -32,7 +32,7 @@ const StorageManager = {
         return this._fetch(url, { method: 'PUT', body: JSON.stringify(body) });
     },
 
-    // ── Local cache (fallback + speed) ───────────
+    // Local cache (fallback + speed) 
     _cacheState(state) {
         try {
             localStorage.setItem(this.CACHE_KEY, JSON.stringify(state));
@@ -46,7 +46,7 @@ const StorageManager = {
         } catch (e) { return null; }
     },
 
-    // ── Public API ───────────────────────────────
+    // Public API 
     getDefaultSave() {
         return {
             playerId: null,
@@ -59,7 +59,7 @@ const StorageManager = {
             selectedCharacter: 'explorer',
             hintsRemaining: 10,
             levelsCompleted: {},
-            worldsUnlocked: [1],
+            worldsUnlocked: [1, 2, 3, 4, 5, 6, 7, 8, 9],
             bossesDefeated: [],
             crystalFragments: 0,
             settings: { soundEnabled: true, musicEnabled: true, difficulty: 'normal' },
