@@ -338,14 +338,17 @@ GENERATORS = {
     7: _trigonometry, 8: _probability,
 }
 
-def generate_level(level_num, asked_history=None):
-    """Generate a complete level with unique questions."""
+def generate_level(level_num, asked_history=None, custom_pool=None):
+    """Generate a complete level with unique questions, potentially including custom ones."""
     world = get_world(level_num)
     if not world:
         return None
 
     if asked_history is None:
         asked_history = []
+    
+    if custom_pool is None:
+        custom_pool = []
 
     diff = _difficulty(level_num, world)
     is_boss = level_num == world['bossLevel']
@@ -354,11 +357,21 @@ def generate_level(level_num, asked_history=None):
     questions = []
     current_asked = asked_history[:]
     
-    for i in range(count):
+    # 1. Try to pick questions from Custom Pool first (if they match this world)
+    world_customs = [q for q in custom_pool if q.get('worldId') == world['id']]
+    random.shuffle(world_customs)
+    
+    for q_data in world_customs:
+        if len(questions) >= count: break
+        if q_data['question'] not in current_asked:
+            questions.append(q_data)
+            current_asked.append(q_data['question'])
+
+    # 2. Fill the rest with randomly generated questions
+    while len(questions) < count:
         best_q = None
         retries = 0
         
-        # Try to find a unique question
         while retries < 20:
             if world['id'] == 9:
                 wid = random.randint(1, 8)
@@ -376,12 +389,14 @@ def generate_level(level_num, asked_history=None):
                 break
             retries += 1
             
-        # If we couldn't find a unique one after 20 tries, just take the last one
         if not best_q:
-            best_q = q
+            best_q = q # Fallback if we really can't find a unique one
             
         questions.append(best_q)
         current_asked.append(best_q['question'])
+
+    # Final shuffle so custom questions are mixed in
+    random.shuffle(questions)
 
     if is_boss:
         story = f'⚔️ {BOSS_NAMES.get(world["id"], "Boss")} stands before you! Defeat them to claim the Crystal Fragment!'

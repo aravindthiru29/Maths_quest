@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - MathQuest</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .login-card { max-width: 400px; margin: 100px auto; padding: 40px; text-align: center; }
+        .error-msg { color: var(--accent-red); margin-top: 10px; font-size: 0.9rem; }
+    </style>
+</head>
+<body class="screen">
+    <div class="glass-card login-card">
+        <h1>🔐 Admin Access</h1>
+        <p>Please enter the administrator password</p>
+        <form method="POST" style="margin-top: 20px;">
+            <input type="password" name="password" class="text-input" placeholder="Password" required autofocus>
+            <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">Login</button>
+        </form>
+        {% if error %}
+            <p class="error-msg">{{ error }}</p>
+        {% endif %}
+        <a href="/" style="display: block; margin-top: 20px; color: var(--text-secondary);">← Back to Game</a>
+    </div>
+</body>
+</html>

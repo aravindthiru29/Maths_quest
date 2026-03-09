@@ -104,3 +104,27 @@ class LevelCompletion(db.Model):
     __table_args__ = (
         db.UniqueConstraint('player_id', 'level_num', name='uq_player_level'),
     )
+
+class CustomQuestion(db.Model):
+    """Stores admin-created questions for specific worlds."""
+    __tablename__ = 'custom_questions'
+
+    id = db.Column(db.Integer, primary_key=True)
+    world_id = db.Column(db.Integer, nullable=False) # Which village this belongs to
+    question = db.Column(db.Text, nullable=False)
+    answer = db.Column(db.String(100), nullable=False)
+    options = db.Column(db.Text, nullable=False) # JSON encoded list
+    hint = db.Column(db.Text)
+    q_type = db.Column(db.String(50))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'worldId': self.world_id,
+            'question': self.question,
+            'answer': self.answer,
+            'options': json.loads(self.options),
+            'hint': self.hint,
+            'type': self.q_type
+        }

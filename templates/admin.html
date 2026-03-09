@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - MathQuest</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .admin-container { max-width: 1000px; margin: 40px auto; padding: 20px; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .section-card { padding: 30px; margin-bottom: 30px; }
+        .question-list { display: flex; flex-direction: column; gap: 15px; }
+        .question-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; }
+        .question-info { flex: 1; }
+        .question-meta { font-size: 0.8rem; color: var(--accent-secondary); margin-bottom: 5px; }
+        .question-text-display { font-size: 1.1rem; font-weight: 600; }
+        .delete-btn { background: var(--accent-red); padding: 8px 16px; font-size: 0.8rem; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .full-width { grid-column: span 2; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-secondary); }
+        .options-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        
+        .empty-state { text-align: center; padding: 40px; color: var(--text-secondary); }
+        
+        select.text-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; }
+    </style>
+</head>
+<body class="screen">
+    <div class="admin-container">
+        <header class="admin-header">
+            <div>
+                <h1>🛡️ Admin Dashboard</h1>
+                <p>Manage custom questions and village content</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="/" class="btn btn-secondary">🏠 View Game</a>
+                <a href="/admin/logout" class="btn btn-secondary">🚪 Logout</a>
+            </div>
+        </header>
+
+        <!-- Add Question Form -->
+        <div class="glass-card section-card">
+            <h3>➕ Add New Custom Question</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Target Village</label>
+                    <select id="world-select" class="text-input">
+                        {% for w in worlds %}
+                            <option value="{{ w.id }}">{{ w.name }} (Lvl {{ w.levelStart }}-{{ w.levelEnd }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Question Type (e.g. Word Problem)</label>
+                    <input type="text" id="q-type" class="text-input" placeholder="Logic Puzzle">
+                </div>
+                <div class="form-group full-width">
+                    <label>Question Text</label>
+                    <textarea id="q-text" class="text-input" style="height: 80px;" placeholder="What is 5 + 5?"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Correct Answer</label>
+                    <input type="text" id="q-answer" class="text-input" placeholder="10">
+                </div>
+                <div class="form-group">
+                    <label>Hint (Optional)</label>
+                    <input type="text" id="q-hint" class="text-input" placeholder="Count on your fingers">
+                </div>
+                <div class="form-group full-width">
+                    <label>Options (4 required)</label>
+                    <div class="options-inputs">
+                        <input type="text" id="opt-1" class="text-input" placeholder="Option A (Correct)">
+                        <input type="text" id="opt-2" class="text-input" placeholder="Option B">
+                        <input type="text" id="opt-3" class="text-input" placeholder="Option C">
+                        <input type="text" id="opt-4" class="text-input" placeholder="Option D">
+                    </div>
+                </div>
+            </div>
+            <button id="btn-add-question" class="btn btn-primary btn-lg" style="margin-top: 20px; width: 100%;">Create Question</button>
+        </div>
+
+        <!-- Question List -->
+        <div class="glass-card section-card">
+            <h3>📋 Existing Custom Questions</h3>
+            <div class="question-list" id="question-list">
+                {% if questions %}
+                    {% for q in questions %}
+                        <div class="glass-card question-item" data-id="{{ q.id }}">
+                            <div class="question-info">
+                                <div class="question-meta">Village {{ q.world_id }} | {{ q.q_type }}</div>
+                                <div class="question-text-display">{{ q.question }}</div>
+                                <div style="font-size: 0.8rem; color: var(--accent-green); margin-top: 5px;">Answer: {{ q.answer }}</div>
+                            </div>
+                            <button class="btn delete-btn btn-delete" data-qid="{{ q.id }}">🗑️ Delete</button>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">No custom questions found. Add some above!</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('btn-add-question').addEventListener('click', async () => {
+            const data = {
+                worldId: parseInt(document.getElementById('world-select').value),
+                type: document.getElementById('q-type').value || 'Admin Question',
+                question: document.getElementById('q-text').value,
+                answer: document.getElementById('q-answer').value,
+                hint: document.getElementById('q-hint').value,
+                options: [
+                    document.getElementById('opt-1').value,
+                    document.getElementById('opt-2').value,
+                    document.getElementById('opt-3').value,
+                    document.getElementById('opt-4').value
+                ]
+            };
+
+            // Basic validation
+            if (!data.question || !data.answer || data.options.some(o => !o)) {
+                alert('Please fill in all fields and provide 4 options.');
+                return;
+            }
+
+            const res = await fetch('/api/admin/questions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                location.reload();
+            } else {
+                alert('Failed to add question. Check unauthorized or data errors.');
+            }
+        });
+
+        // Delete handler using delegation
+        document.getElementById('question-list').addEventListener('click', e => {
+            if (e.target.classList.contains('btn-delete')) {
+                const id = e.target.dataset.qid;
+                deleteQuestion(id);
+            }
+        });
+
+        async function deleteQuestion(id) {
+            if (!confirm('Are you sure you want to delete this question?')) return;
+
+            const res = await fetch(`/api/admin/questions/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (res.ok) {
+                document.querySelector(`[data-id="${id}"]`).remove();
+                if (document.querySelectorAll('.question-item').length === 0) {
+                    location.reload(); 
+                }
+            } else {
+                alert('Failed to delete question.');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -16,9 +16,9 @@ Routes:
   POST /api/players/<id>/select   → Select a character
 """
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from flask_cors import CORS
-from models import db, Player, LevelCompletion
+from models import db, Player, LevelCompletion, CustomQuestion
 from question_generator import generate_level, WORLDS, BOSS_NAMES
 import json
 import os
@@ -108,7 +108,6 @@ def get_worlds():
 def get_characters():
     return jsonify(CHARACTERS)
 
-# API: Question Generation 
 @app.route('/api/questions', methods=['POST'])
 def gen_questions():
     data = request.get_json()
@@ -117,11 +116,83 @@ def gen_questions():
     if not 1 <= level_num <= 45:
         return jsonify({'error': 'Level must be between 1 and 45'}), 400
 
-    result = generate_level(level_num)
+    player_id = data.get('playerId')
+    player = Player.query.get(player_id) if player_id else None
+    asked_history = player.get_asked_questions() if player else []
+
+    # Include custom questions if any for this world
+    world = next((w for w in WORLDS if w['levelStart'] <= level_num <= w['levelEnd']), None)
+    custom_pool = []
+    if world:
+        customs = CustomQuestion.query.filter_by(world_id=world['id']).all()
+        custom_pool = [q.to_dict() for q in customs]
+
+    result = generate_level(level_num, asked_history=asked_history, custom_pool=custom_pool)
     if not result:
         return jsonify({'error': 'Failed to generate level'}), 500
 
+    # Persist the new questions to player history to avoid repeats in next sessions
+    if player:
+        new_asked = list(set(asked_history + [q['question'] for q in result['questions']]))
+        player.set_asked_questions(new_asked)
+        db.session.commit()
+
     return jsonify(result)
+
+
+
+# Admin Routes 
+ADMIN_PASSWORD = "arav456" # Simple password for demonstration
+
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        if request.form.get('password') == ADMIN_PASSWORD:
+            session['admin_logged_in'] = True
+            return redirect(url_for('admin_dashboard'))
+        return render_template('admin_login.html', error="Invalid password")
+    return render_template('admin_login.html')
+
+@app.route('/admin')
+def admin_dashboard():
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin_login'))
+    
+    questions = CustomQuestion.query.all()
+    return render_template('admin.html', questions=questions, worlds=WORLDS)
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    return redirect(url_for('index'))
+
+@app.route('/api/admin/questions', methods=['POST'])
+def admin_add_question():
+    if not session.get('admin_logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    data = request.get_json()
+    q = CustomQuestion(
+        world_id=data['worldId'],
+        question=data['question'],
+        answer=data['answer'],
+        options=json.dumps(data['options']),
+        hint=data.get('hint', ''),
+        q_type=data.get('type', 'Admin Question')
+    )
+    db.session.add(q)
+    db.session.commit()
+    return jsonify(q.to_dict()), 201
+
+@app.route('/api/admin/questions/<int:qid>', methods=['DELETE'])
+def admin_delete_question(qid):
+    if not session.get('admin_logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    q = CustomQuestion.query.get_or_404(qid)
+    db.session.delete(q)
+    db.session.commit()
+    return '', 204
 
 # API: Player Management 
 @app.route('/api/players', methods=['POST'])
