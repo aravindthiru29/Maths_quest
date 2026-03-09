@@ -449,8 +449,15 @@ body {
 .feedback-overlay {
     position: fixed; inset: 0; z-index: 100;
     display: flex; align-items: center; justify-content: center;
-    pointer-events: none;
+    pointer-events: auto;
     animation: fadeIn 0.2s ease;
+}
+
+.feedback-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    justify-content: center;
 }
 
 .feedback-correct { background: rgba(16, 185, 129, 0.15); }

@@ -257,6 +257,7 @@ const UI = {
         <div class="screen gameplay-screen" style="--world-gradient: ${world.gradient}">
             <div class="game-hud">
                 <div class="hud-left">
+                    <button class="btn btn-icon btn-sm" id="btn-quit-game" title="Quit Level">←</button>
                     <span id="hud-progress">Q ${GameEngine.currentQuestionIndex + 1}/${level.questions.length}</span>
                     <span id="hud-streak" class="streak-badge" style="display:none">🔥 0</span>
                 </div>
@@ -284,6 +285,13 @@ const UI = {
             const results = await GameEngine.completeLevelResults();
             this.showScreen('results', results);
         };
+
+        document.getElementById('btn-quit-game').addEventListener('click', () => {
+            if (confirm('Quit this level and return to menu?')) {
+                GameEngine._stopTimer();
+                this.showScreen('menu');
+            }
+        });
 
         document.getElementById('btn-hint').addEventListener('click', async () => {
             const hint = await GameEngine.useHint();
@@ -345,15 +353,18 @@ const UI = {
 
         // Show feedback
         this._showFeedback(result.correct, result.hint);
-
-        setTimeout(async () => {
-            if (result.isLast) {
-                const results = await GameEngine.completeLevelResults();
-                this.showScreen('results', results);
-            } else {
-                this._renderQuestion();
-            }
-        }, result.correct ? 1200 : 2500);
+        
+        // Only auto-advance if correct
+        if (result.correct) {
+            setTimeout(async () => {
+                if (result.isLast) {
+                    const results = await GameEngine.completeLevelResults();
+                    this.showScreen('results', results);
+                } else {
+                    this._renderQuestion();
+                }
+            }, 1200);
+        }
     },
 
     _showFeedback(correct, hint) {
@@ -361,10 +372,35 @@ const UI = {
         if (!overlay) return;
         overlay.style.display = 'flex';
         overlay.className = `feedback-overlay ${correct ? 'feedback-correct' : 'feedback-wrong'}`;
-        overlay.innerHTML = correct
-            ? `<div class="feedback-content"><span class="feedback-icon">✅</span><p>${this._randomPraise()}</p></div>`
-            : `<div class="feedback-content"><span class="feedback-icon">❌</span><p>Not quite!</p>${hint ? `<p class="feedback-hint">💡 ${hint}</p>` : ''}</div>`;
-        setTimeout(() => { overlay.style.display = 'none'; }, correct ? 1000 : 2200);
+        
+        if (correct) {
+            overlay.innerHTML = `<div class="feedback-content"><span class="feedback-icon">✅</span><p>${this._randomPraise()}</p></div>`;
+            setTimeout(() => { overlay.style.display = 'none'; }, 1000);
+        } else {
+            overlay.innerHTML = `
+            <div class="feedback-content">
+                <span class="feedback-icon">❌</span>
+                <p>Not quite!</p>
+                ${hint ? `<p class="feedback-hint">💡 ${hint}</p>` : ''}
+                <div class="feedback-buttons">
+                    <button class="btn btn-primary" id="btn-retry-q">🔄 Try Again</button>
+                    <button class="btn btn-secondary" id="btn-give-up">🏳️ Give Up</button>
+                </div>
+            </div>`;
+            
+            document.getElementById('btn-retry-q').addEventListener('click', () => {
+                overlay.style.display = 'none';
+                this._renderQuestion();
+            });
+            
+            document.getElementById('btn-give-up').addEventListener('click', () => {
+                if (confirm('Quit this level?')) {
+                    overlay.style.display = 'none';
+                    GameEngine._stopTimer();
+                    this.showScreen('menu');
+                }
+            });
+        }
     },
 
     _showHintPopup(hint) {

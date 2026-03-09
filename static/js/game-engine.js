@@ -47,20 +47,27 @@ const GameEngine = {
         const q = this.getCurrentQuestion();
         if (!q) return null;
         const correct = selectedAnswer.toString().trim() === q.answer.toString().trim();
+        
         if (correct) {
             this.streak++;
             this.state.stats.currentStreak++;
             if (this.state.stats.currentStreak > this.state.stats.longestStreak) {
                 this.state.stats.longestStreak = this.state.stats.currentStreak;
             }
+            this.state.stats.correctAnswers++;
         } else {
             this.streak = 0;
             this.state.stats.currentStreak = 0;
         }
+        
         this.state.stats.totalQuestionsAnswered++;
-        if (correct) this.state.stats.correctAnswers++;
         this.answers.push({ question: q, selectedAnswer, correct, timeSpent: 0 });
-        this.currentQuestionIndex++;
+
+        // Only move to next question if correct 
+        if (correct) {
+            this.currentQuestionIndex++;
+        }
+        
         const isLast = this.currentQuestionIndex >= this.currentLevel.questions.length;
         if (isLast) this._stopTimer();
         return { correct, isLast, streak: this.streak, hint: correct ? null : q.hint };
