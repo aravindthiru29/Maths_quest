@@ -14,6 +14,7 @@ const UI = {
     showScreen(screen, data) {
         this.currentScreen = screen;
         this.app.classList.add('screen-transition');
+        SoundManager.play('BUTTON_CLICK');
         setTimeout(() => {
             switch (screen) {
                 case 'title': this._renderTitle(); break;
@@ -26,8 +27,40 @@ const UI = {
                 case 'shop': this._renderShop(); break;
                 case 'stats': this._renderStats(); break;
             }
+            this._renderMuteButton();
             this.app.classList.remove('screen-transition');
         }, 300);
+    },
+
+    _renderMuteButton() {
+        // Remove existing if any
+        const old = document.querySelector('.sound-toggle');
+        if (old) old.remove();
+
+        const container = document.createElement('div');
+        container.className = 'sound-toggle';
+        
+        const isMuted = SoundManager.isMuted;
+        const isMusicMuted = SoundManager.isMusicMuted;
+
+        container.innerHTML = `
+            <button class="btn btn-sound" id="btn-toggle-sound" title="${isMuted ? 'Unmute SFX' : 'Mute SFX'}">
+                ${isMuted ? '🔇' : '🔊'}
+            </button>
+            <button class="btn btn-sound" id="btn-toggle-music" title="${isMusicMuted ? 'Play Music' : 'Pause Music'}">
+                ${isMusicMuted ? '🔈' : '🎵'}
+            </button>
+        `;
+        document.body.appendChild(container);
+
+        document.getElementById('btn-toggle-sound').addEventListener('click', () => {
+            const muted = SoundManager.toggleMute();
+            document.getElementById('btn-toggle-sound').textContent = muted ? '🔇' : '🔊';
+        });
+        document.getElementById('btn-toggle-music').addEventListener('click', () => {
+            const muted = SoundManager.toggleMusic();
+            document.getElementById('btn-toggle-music').textContent = muted ? '🔈' : '🎵';
+        });
     },
 
     //  TITLE SCREEN
@@ -226,7 +259,7 @@ const UI = {
                 ${isBoss ? `<img src="/static/assets/lord_chaos.png" alt="Boss" class="story-img boss-img shake" />` :
                     `<img src="/static/assets/explorer.png" alt="Explorer" class="story-img" />`}
                 <h2>${GameData.getLevelName(data.levelNum)}</h2>
-                <div class="story-text typewriter" id="story-text">${previewData.storyIntro}</div>
+                <div class="story-text" id="story-text">${previewData.storyIntro}</div>
                 <div class="story-info">
                     <span>📝 ${previewData.questions.length} Questions</span>
                     <span>⏱️ ${previewData.timeLimit}s</span>
@@ -278,11 +311,15 @@ const UI = {
             const el = document.getElementById('hud-timer');
             if (el) {
                 el.textContent = t;
-                if (t <= 10) el.classList.add('timer-warning');
+                if (t <= 5) {
+                    el.classList.add('timer-warning');
+                    SoundManager.play('TICK');
+                }
             }
         };
         GameEngine.onComplete = async () => {
             const results = await GameEngine.completeLevelResults();
+            SoundManager.play('LEVEL_COMPLETE');
             this.showScreen('results', results);
         };
 
@@ -296,6 +333,7 @@ const UI = {
         document.getElementById('btn-hint').addEventListener('click', async () => {
             const hint = await GameEngine.useHint();
             if (hint) {
+                SoundManager.play('HINT');
                 this._showHintPopup(hint);
                 document.getElementById('btn-hint').textContent = `💡 ${GameEngine.state.hintsRemaining}`;
             }
@@ -339,6 +377,9 @@ const UI = {
         const result = GameEngine.submitAnswer(btn.dataset.answer);
         if (!result) return;
 
+        if (result.correct) SoundManager.play('CORRECT');
+        else SoundManager.play('WRONG');
+
         // Highlight correct/wrong
         allBtns.forEach(b => {
             if (b.dataset.answer === q.answer) b.classList.add('correct');
@@ -359,6 +400,7 @@ const UI = {
             setTimeout(async () => {
                 if (result.isLast) {
                     const results = await GameEngine.completeLevelResults();
+                    SoundManager.play('LEVEL_COMPLETE');
                     this.showScreen('results', results);
                 } else {
                     this._renderQuestion();
@@ -507,12 +549,16 @@ const UI = {
         document.querySelectorAll('[data-buy]').forEach(btn => {
             btn.addEventListener('click', async () => {
                 const success = await GameEngine.unlockCharacter(btn.dataset.buy);
-                if (success) this._renderShop();
+                if (success) {
+                    SoundManager.play('BUTTON_CLICK');
+                    this._renderShop();
+                }
             });
         });
         document.querySelectorAll('[data-select]').forEach(btn => {
             btn.addEventListener('click', async () => {
                 await GameEngine.selectCharacter(btn.dataset.select);
+                SoundManager.play('BUTTON_CLICK');
                 this._renderShop();
             });
         });

@@ -69,6 +69,7 @@ const StorageManager = {
                 longestStreak: 0,
                 currentStreak: 0
             },
+            askedQuestions: [],
             achievements: [],
             lastPlayed: null
         };
@@ -182,8 +183,12 @@ const StorageManager = {
         return false;
     },
 
-    async generateQuestions(levelNum) {
-        const data = await this._post('/questions', { levelNum });
+    async generateQuestions(levelNum, state) {
+        const body = { levelNum };
+        if (state && state.playerId) {
+            body.playerId = state.playerId;
+        }
+        const data = await this._post('/questions', body);
         return data;
     },
 

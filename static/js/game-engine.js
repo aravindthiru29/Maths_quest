@@ -20,10 +20,10 @@ const GameEngine = {
 
     async startLevel(levelNum) {
         // Fetch questions from Flask backend
-        const levelData = await StorageManager.generateQuestions(levelNum);
+        const levelData = await StorageManager.generateQuestions(levelNum, this.state);
         if (!levelData) {
             // Fallback to client-side generation
-            const fallback = QuestionGenerator.generate(levelNum);
+            const fallback = QuestionGenerator.generate(levelNum, this.state);
             if (!fallback) return null;
             this.currentLevel = fallback;
         } else {

@@ -124,10 +124,10 @@ def _arithmetic(diff):
                 f"A merchant brought {big} gems to the village, and traded {small} of them. How many gems does he have now?"
             ]
             question = random.choice(templates)
-            q_type = '📝 Word Problem'
+            q_type = 'Word Problem'
         else:
             question = f'{big} − {small} = ?'
-            q_type = '🧮 Arithmetic Puzzle'
+            q_type = 'Arithmetic Puzzle'
             
         return _mcq(question, big - small,
                      f'Start at {big} and count back {small} to get {big - small}.', q_type)
@@ -140,10 +140,10 @@ def _arithmetic(diff):
             f"There are {a} houses on the east side of the village and {b} houses on the west side. How many houses are there?"
         ]
         question = random.choice(templates)
-        q_type = '📝 Word Problem'
+        q_type = 'Word Problem'
     else:
         question = f'{a} + {b} = ?'
-        q_type = '🧮 Arithmetic Puzzle'
+        q_type = 'Arithmetic Puzzle'
         
     return _mcq(question, a + b,
                 f'Start at {a} and count up by {b} to get {a + b}.', q_type)
@@ -163,10 +163,10 @@ def _multiplication(diff):
                 f"The village guards need to split into {a} equal patrols. If there are {product} guards total, how many are in each patrol?",
             ]
             question = random.choice(templates)
-            q_type = '📝 Word Problem'
+            q_type = 'Word Problem'
         else:
             question = f'{product} ÷ {a} = ?'
-            q_type = '➗ Division'
+            q_type = 'Division'
             
         return _mcq(question, b,
                      f'Since {a} × {b} = {product}, the answer is {b}.', q_type)
@@ -178,10 +178,10 @@ def _multiplication(diff):
             f"You planted {a} rows of corn, with {b} plants in each row. How many corn plants are there?",
         ]
         question = random.choice(templates)
-        q_type = '📝 Word Problem'
+        q_type = 'Word Problem'
     else:
         question = f'{a} × {b} = ?'
-        q_type = '✖️ Multiplication'
+        q_type = 'Multiplication'
         
     return _mcq(question, a * b,
                 f'{a} groups of {b} makes {a * b}.', q_type)
@@ -198,7 +198,7 @@ def _fractions(diff):
         return _mcq(random.choice(templates),
                      f'{num}/{denom}',
                      f'The top number is {num} and the bottom is {denom}, so it is {num}/{denom}.',
-                     '🍕 Fraction Identification', is_text=True)
+                     'Fraction Identification', is_text=True)
     elif diff == 2:
         d = random.choice([2, 3, 4, 6])
         n = random.randint(1, d - 1)
@@ -211,33 +211,33 @@ def _fractions(diff):
         return _mcq(random.choice(templates),
                      f'{n*m}/{d*m}',
                      f'Multiply top ({n}) and bottom ({d}) by {m} to get {n*m}/{d*m}.',
-                     '⚖️ Equivalent Fractions', is_text=True)
+                     'Equivalent Fractions', is_text=True)
     else:
         d = random.choice([4, 5, 8, 10])
         n = random.randint(1, d)
         decimal = f'{n/d:.2f}'.rstrip('0').rstrip('.')
         return _mcq(f'Convert {n}/{d} to a decimal.',
                      decimal, f'Divide {n} by {d} to get {decimal}.',
-                     '🔢 Decimal Conversion', is_text=True)
+                     'Decimal Conversion', is_text=True)
 
 def _algebra(diff):
     if diff == 1:
         x = random.randint(1, 15)
         b = random.randint(1, 20)
         return _mcq(f'Solve: x + {b} = {x + b}', x,
-                     f'{x + b} - {b} = {x}, so x is {x}.', '🔤 Solve for x')
+                     f'{x + b} - {b} = {x}, so x is {x}.', 'Solve for x')
     elif diff == 2:
         x = random.randint(1, 10)
         a = random.randint(2, 5)
         return _mcq(f'Solve: {a}x = {a * x}', x,
-                     f'{a * x} ÷ {a} = {x}, so x is {x}.', '🔤 Equation Solving')
+                     f'{a * x} ÷ {a} = {x}, so x is {x}.', 'Equation Solving')
     else:
         x = random.randint(1, 8)
         a = random.randint(2, 5)
         b = random.randint(1, 10)
         result = a * x + b
         return _mcq(f'Solve: {a}x + {b} = {result}', x,
-                     f'Subtract {b} to get {a}x = {result - b}, then divide by {a} to get x = {x}.', '🔤 Two-Step Equation')
+                     f'Subtract {b} to get {a}x = {result - b}, then divide by {a} to get x = {x}.', 'Two-Step Equation')
 
 def _geometry(diff):
     if diff == 1:
@@ -245,14 +245,14 @@ def _geometry(diff):
                   ('Hexagon', 6), ('Octagon', 8)]
         name, sides = random.choice(shapes)
         return _mcq(f'How many sides does a {name} have?', sides,
-                     f'A {name} has exactly {sides} sides.', '📐 Shape Knowledge')
+                     f'A {name} has exactly {sides} sides.', 'Shape Knowledge')
     elif diff == 2:
         l, w = random.randint(3, 15), random.randint(3, 15)
         if random.random() > 0.5:
             return _mcq(f'Find the perimeter of a rectangle: length={l}, width={w}',
-                        2 * (l + w), f'Perimeter = 2 × ({l} + {w}) = {2 * (l + w)}.', '📏 Perimeter')
+                        2 * (l + w), f'Perimeter = 2 × ({l} + {w}) = {2 * (l + w)}.', 'Perimeter')
         return _mcq(f'Find the area of a rectangle: length={l}, width={w}',
-                    l * w, f'Area = {l} × {w} = {l * w}.', '📐 Area')
+                    l * w, f'Area = {l} × {w} = {l * w}.', 'Area')
     else:
         angles = [60, 90, 120, 45, 30]
         a1 = random.choice(angles)
@@ -260,10 +260,10 @@ def _geometry(diff):
         a3 = 180 - a1 - a2
         if 0 < a3 < 180:
             return _mcq(f'A triangle has angles {a1}° and {a2}°. What is the third angle?',
-                        a3, f'180° - {a1}° - {a2}° = {a3}°. The third angle is {a3}°. All add to 180°.', '📐 Angle Puzzle')
+                        a3, f'180° - {a1}° - {a2}° = {a3}°. The third angle is {a3}°. All add to 180°.', 'Angle Puzzle')
         side = random.randint(3, 12)
         return _mcq(f'Find the area of a square with side {side}',
-                    side * side, f'Area of square = {side} × {side} = {side * side}.', '📐 Area')
+                    side * side, f'Area of square = {side} × {side} = {side * side}.', 'Area')
 
 def _coordinates(diff):
     if diff == 1:
@@ -271,19 +271,19 @@ def _coordinates(diff):
         signs = random.choice([(1, 1, 1), (-1, 1, 2), (-1, -1, 3), (1, -1, 4)])
         xv, yv, q = x * signs[0], y * signs[1], signs[2]
         return _mcq(f'Point ({xv}, {yv}) is in which quadrant?', q,
-                    f'The point has x={xv} and y={yv}, which places it in quadrant {q}.', '📍 Quadrants')
+                    f'The point has x={xv} and y={yv}, which places it in quadrant {q}.', 'Quadrants')
     elif diff == 2:
         x1, y1 = random.randint(0, 5), random.randint(0, 5)
         x2, y2 = random.randint(0, 5), random.randint(0, 5)
         mx = (x1 + x2) / 2
         return _mcq(f'Find midpoint of ({x1},{y1}) and ({x2},{y2}). What is the x-coordinate?',
-                    mx, f'Midpoint x = ({x1} + {x2}) / 2 = {mx}.', '📍 Midpoint', is_decimal=True)
+                    mx, f'Midpoint x = ({x1} + {x2}) / 2 = {mx}.', 'Midpoint', is_decimal=True)
     else:
         x1, y1 = random.randint(0, 4), random.randint(0, 4)
         dx, dy = random.randint(1, 5), random.randint(1, 5)
         dist = round(math.sqrt(dx*dx + dy*dy), 1)
         return _mcq(f'Distance from ({x1},{y1}) to ({x1+dx},{y1+dy})? (round to 1 decimal)',
-                    dist, f'Distance = √( ({x1+dx}-{x1})² + ({y1+dy}-{y1})² ) = √({dx}² + {dy}²) = {dist}.', '📍 Distance', is_decimal=True)
+                    dist, f'Distance = √( ({x1+dx}-{x1})² + ({y1+dy}-{y1})² ) = √({dx}² + {dy}²) = {dist}.', 'Distance', is_decimal=True)
 
 def _trigonometry(diff):
     if diff == 1:
@@ -294,7 +294,7 @@ def _trigonometry(diff):
         ]
         q, a, hint = random.choice(sides)
         return _mcq(f'In a right triangle, what is: "{q}"?', a,
-                    hint, '📐 Triangle Sides', is_text=True)
+                    hint, 'Triangle Sides', is_text=True)
     elif diff == 2:
         defs = [
             ('sin(θ) = ?', 'Opposite/Hypotenuse', 'SOH: sin = Opposite / Hypotenuse.'),
@@ -302,7 +302,7 @@ def _trigonometry(diff):
             ('tan(θ) = ?', 'Opposite/Adjacent', 'TOA: tan = Opposite / Adjacent.'),
         ]
         q, a, hint = random.choice(defs)
-        return _mcq(q, a, hint, '📐 Trig Ratios', is_text=True)
+        return _mcq(q, a, hint, 'Trig Ratios', is_text=True)
     else:
         angles = [
             {'deg': 30, 'sin': 0.5,  'cos': 0.87, 'tan': 0.58},
@@ -313,7 +313,7 @@ def _trigonometry(diff):
         f = random.choice(['sin', 'cos', 'tan'])
         return _mcq(f'What is {f}({ang["deg"]}°)? (round to 2 decimals)',
                     ang[f], f'The {f} of {ang["deg"]}° evaluates to {ang[f]}.',
-                    '📐 Trig Values', is_decimal=True)
+                    'Trig Values', is_decimal=True)
 
 def _probability(diff):
     if diff == 1:
@@ -321,16 +321,16 @@ def _probability(diff):
         mean = round(sum(data) / len(data), 1)
         return _mcq(f'Find the mean of: {", ".join(map(str, data))}', mean,
                     f'Sum is {sum(data)}. {sum(data)} ÷ {len(data)} = {mean}. The mean is {mean}.',
-                    '📊 Mean', is_decimal=True)
+                    'Mean', is_decimal=True)
     elif diff == 2:
         data = sorted([random.randint(1, 10) for _ in range(5)])
         return _mcq(f'Find the median of: {", ".join(map(str, data))}', data[2],
-                    f'The sorted numbers are {", ".join(map(str, data))}. The middle one is {data[2]}.', '📊 Median')
+                    f'The sorted numbers are {", ".join(map(str, data))}. The middle one is {data[2]}.', 'Median')
     else:
         target = random.randint(1, 6)
         return _mcq(f'Probability of rolling a {target} on a fair die? (as fraction)',
                     '1/6', f'There is 1 favorable outcome ({target}) out of 6 possible outcomes, so 1/6.',
-                    '🎲 Probability', is_text=True)
+                    'Probability', is_text=True)
 
 GENERATORS = {
     1: _arithmetic, 2: _multiplication, 3: _fractions,
@@ -338,29 +338,50 @@ GENERATORS = {
     7: _trigonometry, 8: _probability,
 }
 
-def generate_level(level_num):
-    """Generate a complete level with questions."""
+def generate_level(level_num, asked_history=None):
+    """Generate a complete level with unique questions."""
     world = get_world(level_num)
     if not world:
         return None
+
+    if asked_history is None:
+        asked_history = []
 
     diff = _difficulty(level_num, world)
     is_boss = level_num == world['bossLevel']
     count = 8 if is_boss else 5
 
     questions = []
+    current_asked = asked_history[:]
+    
     for i in range(count):
-        if is_boss and world['id'] == 9 and i >= count - 3:
-            # Final boss: mixed from random worlds
-            wid = random.randint(1, 8)
-            gen = GENERATORS.get(wid, _arithmetic)
-            questions.append(gen(diff))
-        elif is_boss:
-            gen = GENERATORS.get(world['id'], _arithmetic)
-            questions.append(gen(min(diff + 1, 3)))
-        else:
-            gen = GENERATORS.get(world['id'], _arithmetic)
-            questions.append(gen(diff))
+        best_q = None
+        retries = 0
+        
+        # Try to find a unique question
+        while retries < 20:
+            if world['id'] == 9:
+                wid = random.randint(1, 8)
+                gen = GENERATORS.get(wid, _arithmetic)
+                q = gen(diff)
+            elif is_boss:
+                gen = GENERATORS.get(world['id'], _arithmetic)
+                q = gen(min(diff + 1, 3))
+            else:
+                gen = GENERATORS.get(world['id'], _arithmetic)
+                q = gen(diff)
+                
+            if q['question'] not in current_asked:
+                best_q = q
+                break
+            retries += 1
+            
+        # If we couldn't find a unique one after 20 tries, just take the last one
+        if not best_q:
+            best_q = q
+            
+        questions.append(best_q)
+        current_asked.append(best_q['question'])
 
     if is_boss:
         story = f'⚔️ {BOSS_NAMES.get(world["id"], "Boss")} stands before you! Defeat them to claim the Crystal Fragment!'

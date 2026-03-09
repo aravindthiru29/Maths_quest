@@ -5,23 +5,35 @@ const QuestionGenerator = {
     rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; },
     shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = this.rand(0, i); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; },
 
-    generate(levelNum) {
+    generate(levelNum, state) {
         const world = GameData.getWorld(levelNum);
         if (!world) return null;
         const diff = this._difficulty(levelNum, world);
         const isBoss = levelNum === world.bossLevel;
         const count = isBoss ? 8 : 5;
         const questions = [];
+        const asked = state?.askedQuestions || [];
+        
         for (let i = 0; i < count; i++) {
-            if (isBoss && world.id === 9 && i >= count - 3) {
-                // Final boss: mixed from different worlds
-                questions.push(this._makeQuestion(this.rand(1, 8), diff + 1));
-            } else if (isBoss) {
-                questions.push(this._makeQuestion(world.id, diff + 1));
-            } else {
-                questions.push(this._makeQuestion(world.id, diff));
-            }
+            let q;
+            let retries = 0;
+            // Try to get a unique question
+            do {
+                const wid = world.id === 9 ? this.rand(1, 8) : world.id;
+                const d = isBoss && world.id !== 9 ? diff + 1 : diff;
+                q = this._makeQuestion(wid, d);
+                retries++;
+            } while (asked.includes(q.question) && retries < 20);
+            
+            questions.push(q);
+            if (state) asked.push(q.question);
         }
+
+        if (state) {
+            // Keep history limited to 500
+            state.askedQuestions = asked.slice(-500);
+        }
+
         return {
             levelNum, worldId: world.id, isBoss, questions,
             timeLimit: isBoss ? 180 : 90,
@@ -60,17 +72,17 @@ const QuestionGenerator = {
             answer = big - small; question = `${big} - ${small} = ?`;
             hint = `Start at ${big} and count back ${small} to get ${answer}.`;
         }
-        return this._mcq(question, answer, hint, '🧮 Arithmetic Puzzle');
+        return this._mcq(question, answer, hint, 'Arithmetic Puzzle');
     },
 
     _multiplication(diff) {
         const max = diff === 1 ? 10 : diff === 2 ? 12 : 15;
         const a = this.rand(2, max); const b = this.rand(2, max);
         if (diff < 3 || this.rand(0, 1) === 0) {
-            return this._mcq(`${a} × ${b} = ?`, a * b, `${a} groups of ${b} makes ${a * b}.`, '✖️ Multiplication');
+            return this._mcq(`${a} × ${b} = ?`, a * b, `${a} groups of ${b} makes ${a * b}.`, 'Multiplication');
         } else {
             const product = a * b;
-            return this._mcq(`${product} ÷ ${a} = ?`, b, `Since ${a} × ${b} = ${product}, the answer is ${b}.`, '➗ Division');
+            return this._mcq(`${product} ÷ ${a} = ?`, b, `Since ${a} × ${b} = ${product}, the answer is ${b}.`, 'Division');
         }
     },
 
@@ -82,7 +94,7 @@ const QuestionGenerator = {
                 num === 1 && denom === 4 ? 'one quarter' : `${num}/${denom}`;
             return this._mcq(`What fraction is ${num} out of ${denom} equal parts?`,
                 `${num}/${denom}`, `The top number is ${num} and the bottom is ${denom}, so it is ${num}/${denom}.`,
-                '🍕 Fraction Identification', true);
+                'Fraction Identification', true);
         } else if (diff === 2) {
             const d = [2, 3, 4, 6][this.rand(0, 3)];
             const n = this.rand(1, d - 1);
@@ -90,13 +102,13 @@ const QuestionGenerator = {
             const equivN = n * m; const equivD = d * m;
             return this._mcq(`Which fraction is equivalent to ${n}/${d}?`,
                 `${equivN}/${equivD}`, `Multiply top (${n}) and bottom (${d}) by ${m} to get ${equivN}/${equivD}.`,
-                '⚖️ Equivalent Fractions', true);
+                'Equivalent Fractions', true);
         } else {
             const d = [4, 5, 8, 10][this.rand(0, 3)];
             const n = this.rand(1, d);
             const decimal = (n / d).toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
             return this._mcq(`Convert ${n}/${d} to a decimal.`,
-                decimal, `Divide ${n} by ${d} to get ${decimal}.`, '🔢 Decimal Conversion', true);
+                decimal, `Divide ${n} by ${d} to get ${decimal}.`, 'Decimal Conversion', true);
         }
     },
 
@@ -105,17 +117,17 @@ const QuestionGenerator = {
             const x = this.rand(1, 15); const b = this.rand(1, 20);
             const sum = x + b;
             return this._mcq(`Solve: x + ${b} = ${sum}`, x,
-                `${sum} - ${b} = ${x}, so x is ${x}.`, '🔤 Solve for x');
+                `${sum} - ${b} = ${x}, so x is ${x}.`, 'Solve for x');
         } else if (diff === 2) {
             const x = this.rand(1, 10); const a = this.rand(2, 5);
             const product = a * x;
             return this._mcq(`Solve: ${a}x = ${product}`, x,
-                `${product} ÷ ${a} = ${x}, so x is ${x}.`, '🔤 Equation Solving');
+                `${product} ÷ ${a} = ${x}, so x is ${x}.`, 'Equation Solving');
         } else {
             const x = this.rand(1, 8); const a = this.rand(2, 5); const b = this.rand(1, 10);
             const result = a * x + b;
             return this._mcq(`Solve: ${a}x + ${b} = ${result}`, x,
-                `Subtract ${b} to get ${a}x = ${result - b}, then divide by ${a} to get x = ${x}.`, '🔤 Two-Step Equation');
+                `Subtract ${b} to get ${a}x = ${result - b}, then divide by ${a} to get x = ${x}.`, 'Two-Step Equation');
         }
     },
 
@@ -128,16 +140,16 @@ const QuestionGenerator = {
             ];
             const s = shapes[this.rand(0, shapes.length - 1)];
             return this._mcq(`How many sides does a ${s.name} have?`, s.sides,
-                `A ${s.name} has exactly ${s.sides} sides.`, '📐 Shape Knowledge');
+                `A ${s.name} has exactly ${s.sides} sides.`, 'Shape Knowledge');
         } else if (diff === 2) {
             const l = this.rand(3, 15); const w = this.rand(3, 15);
             const type = this.rand(0, 1);
             if (type === 0) {
                 return this._mcq(`Find the perimeter of a rectangle: length=${l}, width=${w}`,
-                    2 * (l + w), `Perimeter = 2 × (${l} + ${w}) = ${2 * (l + w)}.`, '📏 Perimeter');
+                    2 * (l + w), `Perimeter = 2 × (${l} + ${w}) = ${2 * (l + w)}.`, 'Perimeter');
             }
             return this._mcq(`Find the area of a rectangle: length=${l}, width=${w}`,
-                l * w, `Area = ${l} × ${w} = ${l * w}.`, '📐 Area');
+                l * w, `Area = ${l} × ${w} = ${l * w}.`, 'Area');
         } else {
             const angles = [60, 90, 120, 45, 30];
             const a1 = angles[this.rand(0, angles.length - 1)];
@@ -145,11 +157,11 @@ const QuestionGenerator = {
             const a3 = 180 - a1 - a2;
             if (a3 > 0 && a3 < 180) {
                 return this._mcq(`A triangle has angles ${a1}° and ${a2}°. What is the third angle?`,
-                    a3, `180° - ${a1}° - ${a2}° = ${a3}°. The third angle is ${a3}°.`, '📐 Angle Puzzle');
+                    a3, `180° - ${a1}° - ${a2}° = ${a3}°. The third angle is ${a3}°.`, 'Angle Puzzle');
             }
             const side = this.rand(3, 12);
             return this._mcq(`Find the area of a square with side ${side}`,
-                side * side, `Area of square = ${side} × ${side} = ${side * side}.`, '📐 Area');
+                side * side, `Area of square = ${side} × ${side} = ${side * side}.`, 'Area');
         }
     },
 
@@ -158,19 +170,19 @@ const QuestionGenerator = {
             const x = this.rand(-5, 5); const y = this.rand(-5, 5);
             const quadrant = x > 0 && y > 0 ? 1 : x < 0 && y > 0 ? 2 : x < 0 && y < 0 ? 3 : 4;
             return this._mcq(`Point (${x}, ${y}) is in which quadrant?`, quadrant,
-                `The point has x=${x} and y=${y}, which places it in quadrant ${quadrant}.`, '📍 Quadrants');
+                `The point has x=${x} and y=${y}, which places it in quadrant ${quadrant}.`, 'Quadrants');
         } else if (diff === 2) {
             const x1 = this.rand(0, 5); const y1 = this.rand(0, 5);
             const x2 = this.rand(0, 5); const y2 = this.rand(0, 5);
             const mx = ((x1 + x2) / 2); const my = ((y1 + y2) / 2);
             return this._mcq(`Find midpoint of (${x1},${y1}) and (${x2},${y2}). What is the x-coordinate?`,
-                mx, `Midpoint x = (${x1} + ${x2}) / 2 = ${mx}.`, '📍 Midpoint', false, true);
+                mx, `Midpoint x = (${x1} + ${x2}) / 2 = ${mx}.`, 'Midpoint', false, true);
         } else {
             const x1 = this.rand(0, 4); const y1 = this.rand(0, 4);
             const dx = this.rand(1, 5); const dy = this.rand(1, 5);
             const dist = Math.round(Math.sqrt(dx * dx + dy * dy) * 10) / 10;
             return this._mcq(`Distance from (${x1},${y1}) to (${x1 + dx},${y1 + dy})? (round to 1 decimal)`,
-                dist, `Distance = √((${x1 + dx}-${x1})² + (${y1 + dy}-${y1})²) = √(${dx}² + ${dy}²) = ${dist}.`, '📍 Distance', false, true);
+                dist, `Distance = √((${x1 + dx}-${x1})² + (${y1 + dy}-${y1})²) = √(${dx}² + ${dy}²) = ${dist}.`, 'Distance', false, true);
         }
     },
 
@@ -182,7 +194,7 @@ const QuestionGenerator = {
                 { q: 'The side next to angle θ (not hypotenuse)', a: 'Adjacent', hint: 'The side next to angle θ, other than the hypotenuse, is the Adjacent.' }
             ];
             const s = sides[this.rand(0, sides.length - 1)];
-            return this._mcq(`In a right triangle, what is: "${s.q}"?`, s.a, s.hint, '📐 Triangle Sides', true);
+            return this._mcq(`In a right triangle, what is: "${s.q}"?`, s.a, s.hint, 'Triangle Sides', true);
         } else if (diff === 2) {
             const defs = [
                 { q: 'sin(θ) = ?', a: 'Opposite/Hypotenuse', hint: 'SOH: sin = Opposite / Hypotenuse.' },
@@ -190,7 +202,7 @@ const QuestionGenerator = {
                 { q: 'tan(θ) = ?', a: 'Opposite/Adjacent', hint: 'TOA: tan = Opposite / Adjacent.' }
             ];
             const d = defs[this.rand(0, defs.length - 1)];
-            return this._mcq(d.q, d.a, d.hint, '📐 Trig Ratios', true);
+            return this._mcq(d.q, d.a, d.hint, 'Trig Ratios', true);
         } else {
             const angles = [
                 { deg: 30, sin: 0.5, cos: 0.87, tan: 0.58 },
@@ -201,7 +213,7 @@ const QuestionGenerator = {
             const funcs = ['sin', 'cos', 'tan'];
             const f = funcs[this.rand(0, 2)];
             return this._mcq(`What is ${f}(${a.deg}°)? (round to 2 decimals)`,
-                a[f], `The ${f} of ${a.deg}° evaluates to ${a[f]}.`, '📐 Trig Values', false, true);
+                a[f], `The ${f} of ${a.deg}° evaluates to ${a[f]}.`, 'Trig Values', false, true);
         }
     },
 
@@ -211,15 +223,15 @@ const QuestionGenerator = {
             const sum = data.reduce((a, b) => a + b, 0);
             const mean = Math.round((sum / data.length) * 10) / 10;
             return this._mcq(`Find the mean of: ${data.join(', ')}`, mean,
-                `Sum is ${sum}. ${sum} ÷ ${data.length} = ${mean}. The mean is ${mean}.`, '📊 Mean', false, true);
+                `Sum is ${sum}. ${sum} ÷ ${data.length} = ${mean}. The mean is ${mean}.`, 'Mean', false, true);
         } else if (diff === 2) {
             const data = Array.from({ length: 5 }, () => this.rand(1, 10)).sort((a, b) => a - b);
             return this._mcq(`Find the median of: ${data.join(', ')}`, data[2],
-                `The sorted numbers are ${data.join(', ')}. The middle one is ${data[2]}.`, '📊 Median');
+                `The sorted numbers are ${data.join(', ')}. The middle one is ${data[2]}.`, 'Median');
         } else {
             const faces = 6; const target = this.rand(1, 6);
             return this._mcq(`Probability of rolling a ${target} on a fair die? (as fraction)`,
-                '1/6', `There is 1 favorable outcome (${target}) out of ${faces} possible outcomes, so 1/6.`, '🎲 Probability', true);
+                '1/6', `There is 1 favorable outcome (${target}) out of ${faces} possible outcomes, so 1/6.`, 'Probability', true);
         }
     },
 

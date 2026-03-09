@@ -25,6 +25,8 @@ class Player(db.Model):
     correct_answers = db.Column(db.Integer, default=0)
     longest_streak = db.Column(db.Integer, default=0)
     current_streak = db.Column(db.Integer, default=0)
+    # Asked questions to ensure uniqueness
+    asked_questions = db.Column(db.Text, default='[]')
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_played = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -48,6 +50,12 @@ class Player(db.Model):
 
     def set_bosses_defeated(self, bosses):
         self.bosses_defeated = json.dumps(bosses)
+
+    def get_asked_questions(self):
+        return json.loads(self.asked_questions or '[]')
+
+    def set_asked_questions(self, asked):
+        self.asked_questions = json.dumps(asked)
 
     def to_dict(self):
         """Convert to the same format the frontend expects."""
