@@ -1,5 +1,4 @@
 """MathQuest: Database Models SQLAlchemy models for player progress, level completions, and achievements."""
-
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import json
@@ -81,7 +80,6 @@ class Player(db.Model):
             },
             'lastPlayed': self.last_played.isoformat() if self.last_played else None
         }
-
 
 class LevelCompletion(db.Model):
     """Stores per-level completion records."""

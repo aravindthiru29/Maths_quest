@@ -45,7 +45,7 @@ const UI = {
                 <h1 class="game-title">
                     <span class="title-math">Math</span><span class="title-quest">Quest</span>
                 </h1>
-                <p class="game-subtitle">The Lost Kingdom of Numbers</p>
+                <p class="game-subtitle">The Lost Village of Numbers</p>
                 <div class="title-buttons">
                     ${hasSave ? `<button class="btn btn-primary btn-lg" id="btn-continue">⚔️ Continue Adventure</button>` : ''}
                     <button class="btn ${hasSave ? 'btn-secondary' : 'btn-primary btn-lg'}" id="btn-new-game">🌟 New Adventure</button>
@@ -120,8 +120,8 @@ const UI = {
                 </button>
                 <button class="menu-card glass-card" id="btn-worldmap">
                     <span class="menu-icon">🌍</span>
-                    <h3>World Map</h3>
-                    <p>Choose a world</p>
+                    <h3>Village Map</h3>
+                    <p>Choose a village</p>
                 </button>
                 <button class="menu-card glass-card" id="btn-shop">
                     <span class="menu-icon">🛒</span>
@@ -155,7 +155,7 @@ const UI = {
             <button class="world-card glass-card ${unlocked ? '' : 'locked'} ${defeated ? 'completed' : ''}"
                     data-world="${w.id}" style="--world-color: ${w.color}; --world-gradient: ${w.gradient}">
                 <h3>${w.name}</h3>
-                <p>${unlocked ? w.description : '🔒 Complete previous world'}</p>
+                <p>${unlocked ? w.description : '🔒 Complete previous village'}</p>
                 ${unlocked ? `<div class="progress-bar"><div class="progress-fill" style="width:${progress.percentage}%"></div></div>
                 <span class="progress-label">${progress.completed}/${progress.total} levels</span>` : ''}
                 ${defeated ? '<div class="world-badge">💎 Complete</div>' : ''}
@@ -166,11 +166,11 @@ const UI = {
         <div class="screen worldmap-screen">
             <div class="screen-header">
                 <button class="btn btn-icon" id="btn-back-menu">← Back</button>
-                <h2>🗺️ World Map</h2>
+                <h2>🗺️ Village Map</h2>
                 <div class="header-stats">⭐ ${s.totalStars} | 🪙 ${s.totalCoins}</div>
             </div>
             <div class="world-path">
-                <img src="/static/assets/world_map.png" alt="World Map" class="worldmap-bg" />
+                <img src="/static/assets/world_map.png" alt="Village Map" class="worldmap-bg" />
             </div>
             <div class="worlds-grid">${worldCards}</div>
         </div>`;
@@ -502,7 +502,7 @@ const UI = {
                 <div class="stat-card glass-card"><span class="stat-big">🎯 ${acc}%</span><span>Accuracy</span></div>
                 <div class="stat-card glass-card"><span class="stat-big">🔥 ${s.stats.longestStreak}</span><span>Best Streak</span></div>
             </div>
-            <h3 class="section-title">World Progress</h3>
+            <h3 class="section-title">Village Progress</h3>
             <div class="world-progress-list">
                 ${GameData.worlds.map(w => {
                     const p = StorageManager.getWorldProgress(s, w.id);

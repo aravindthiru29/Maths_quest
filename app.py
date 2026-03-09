@@ -23,7 +23,7 @@ from question_generator import generate_level, WORLDS, BOSS_NAMES
 import json
 import os
 
-# ── App Setup ──
+# App Setup 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mathquest.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -35,7 +35,7 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-# ── Characters ──
+# Characters
 CHARACTERS = [
     {'id': 'explorer', 'name': 'Math Explorer', 'emoji': '🧭', 'cost': 0},
     {'id': 'wizard',   'name': 'Number Wizard',  'emoji': '🧙', 'cost': 500},
@@ -45,14 +45,12 @@ CHARACTERS = [
     {'id': 'dragon',   'name': 'Data Dragon',     'emoji': '🐉', 'cost': 5000},
 ]
 
-
-# ── Page Routes ──
+# Page Routes
 @app.route('/')
 def index():
     return render_template('index.html')
 
-
-# ── API: World & Character Data ──
+# API: World & Character Data 
 @app.route('/api/worlds', methods=['GET'])
 def get_worlds():
     worlds = []
@@ -82,37 +80,35 @@ def get_worlds():
             'description': [
                 '',
                 'Master addition and subtraction to rebuild the village!',
-                'Conquer the valley with multiplication and division!',
-                'Unite the Fraction Kingdom with equal parts!',
+                'Conquer the village with multiplication and division!',
+                'Unite the Fraction Village with equal parts!',
                 'Decode the mysteries of variables and equations!',
-                'Navigate shapes and angles in the wild jungle!',
-                'Plot your course through the stars!',
-                'Climb the tower using angles and ratios!',
-                'Predict the unpredictable in the lab!',
-                'Face Lord Chaos and restore the Crystal of Knowledge!',
+                'Navigate shapes and angles in the wild village!',
+                'Plot your course through the village!',
+                'Unlock the village secrets using angles and ratios!',
+                'Predict the unpredictable in the probability village!',
+                'Face Lord Chaos and restore the village of Knowledge!',
             ][w['id']],
             'story': [
                 '',
                 'The villagers have lost count of everything! Help them restore order.',
-                'The valley bridges are broken. Only multiplication can rebuild them!',
-                'The kingdom is divided! Use fractions to bring the pieces together.',
-                'The city runs on equations, but the variables have gone missing!',
-                'The jungle paths form mysterious shapes. Decode them!',
-                'The star maps are scrambled! Use coordinates to navigate.',
-                'Each floor of the tower is locked with trigonometric puzzles!',
-                'The lab experiments are out of control! Use probability to fix them.',
-                'The final battle awaits. All your math skills will be tested!',
+                'The village bridges are broken. Only multiplication can rebuild them!',
+                'The village is divided! Use fractions to bring the pieces together.',
+                'The village runs on equations, but the variables have gone missing!',
+                'The village paths form mysterious shapes. Decode them!',
+                'The village maps are scrambled! Use coordinates to navigate.',
+                'Each part of the village is locked with trigonometric puzzles!',
+                'The village experiments are out of control! Use probability to fix them.',
+                'The final battle awaits in the Chaos Village. All your math skills will be tested!',
             ][w['id']],
         })
     return jsonify(worlds)
-
 
 @app.route('/api/characters', methods=['GET'])
 def get_characters():
     return jsonify(CHARACTERS)
 
-
-# ── API: Question Generation 
+# API: Question Generation 
 @app.route('/api/questions', methods=['POST'])
 def gen_questions():
     data = request.get_json()
@@ -127,25 +123,21 @@ def gen_questions():
 
     return jsonify(result)
 
-
-# ── API: Player Management 
+# API: Player Management 
 @app.route('/api/players', methods=['POST'])
 def create_player():
     data = request.get_json()
     name = data.get('name', 'Explorer').strip()[:50] or 'Explorer'
-
     player = Player(name=name)
     db.session.add(player)
     db.session.commit()
 
     return jsonify(player.to_dict()), 201
 
-
 @app.route('/api/players/<int:player_id>', methods=['GET'])
 def get_player(player_id):
     player = Player.query.get_or_404(player_id)
     return jsonify(player.to_dict())
-
 
 @app.route('/api/players/<int:player_id>', methods=['PUT'])
 def update_player(player_id):
@@ -178,7 +170,6 @@ def update_player(player_id):
 
     db.session.commit()
     return jsonify(player.to_dict())
-
 
 @app.route('/api/players/<int:player_id>/complete', methods=['POST'])
 def complete_level(player_id):
@@ -254,7 +245,6 @@ def complete_level(player_id):
 
     return jsonify(player.to_dict())
 
-
 @app.route('/api/players/<int:player_id>/hint', methods=['POST'])
 def use_hint(player_id):
     player = Player.query.get_or_404(player_id)
@@ -263,7 +253,6 @@ def use_hint(player_id):
     player.hints_remaining -= 1
     db.session.commit()
     return jsonify({'hintsRemaining': player.hints_remaining})
-
 
 @app.route('/api/players/<int:player_id>/unlock', methods=['POST'])
 def unlock_character(player_id):
@@ -288,7 +277,6 @@ def unlock_character(player_id):
 
     return jsonify(player.to_dict())
 
-
 @app.route('/api/players/<int:player_id>/select', methods=['POST'])
 def select_character(player_id):
     player = Player.query.get_or_404(player_id)
@@ -302,7 +290,6 @@ def select_character(player_id):
     db.session.commit()
     return jsonify(player.to_dict())
 
-
-# ── Run ────────────────────────────────────────────────────────
+# Run 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

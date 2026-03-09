@@ -1,5 +1,4 @@
-// MathQuest: Storage Manager (Flask API Version)
-// Uses Flask REST API for persistence + localStorage as cache
+// MathQuest: Storage Manager
 
 const StorageManager = {
     CACHE_KEY: 'mathquest_cache',

@@ -155,9 +155,9 @@ const GameEngine = {
     isLevelUnlocked(levelNum) {
         if (levelNum === 1) return true;
         
-        // Also unlock if it's the first level of its world and the world is unlocked
+        // All levels within unlocked villages map are open to explore
         const world = GameData.getWorld(levelNum);
-        if (world && world.levelStart === levelNum && this.state.worldsUnlocked.includes(world.id)) {
+        if (world && this.state.worldsUnlocked.includes(world.id)) {
             return true;
         }
 
