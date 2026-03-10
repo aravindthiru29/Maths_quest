@@ -139,8 +139,6 @@ def gen_questions():
 
     return jsonify(result)
 
-
-
 # Admin Routes 
 ADMIN_PASSWORD = "arav456" # Simple password for demonstration
 
